@@ -78,5 +78,7 @@ void keyPressed() {
     saveFrame(name+".png");
   } else if (key == 'a'){
     c.randomPopulate(5);
+  } else if (key == 'c'){
+    c.clearGrid();
   }
 }

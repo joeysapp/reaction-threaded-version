@@ -6,8 +6,8 @@ class CellSystem implements Runnable {
   int w, h, n_cols;
   float f, k, da, db; 
   float[][] convolution = {{0.05, 0.2, 0.05}, 
-                           {0.2, -1, 0.2}, 
-                           {0.05, 0.2, 0.05}};
+    {0.2, -1, 0.2}, 
+    {0.05, 0.2, 0.05}};
 
   CellSystem(int _n_cols, int size, float _f, float _k, float _da, float _db) {
     n_cols = _n_cols;
@@ -28,6 +28,15 @@ class CellSystem implements Runnable {
     tasks = new LinkedList<CellRunnable>();
     for (int i = 1; i < width-1; i += n_cols) {
       tasks.add(new CellRunnable(i, latch, n_cols));
+    }
+  }
+
+  void clearGrid() {
+    for (int x = 0; x < (width/size + 2); x++) {
+      for (int y = 0; y < (height/size + 2); y++) {
+        cells[x][y].A = 1;
+        cells[x][y].B = 0;
+      }
     }
   }
 
@@ -64,30 +73,30 @@ class CellSystem implements Runnable {
       }
     }
   }
-  
-  void setBorder(){
+
+  void setBorder() {
     // ALSO corners should technically go to the opposite corner but who cares
     /* MIRRORING instead 
-    for (int y = 0; y < h+2; y++){
-      cells[0][y].A = cells[1][y].A;
-      cells[0][y].B = cells[1][y].B;
-      cells[w+1][y].A = cells[w][y].A;
-      cells[w+1][y].B = cells[w][y].B;
-    }
-    for (int x = 0; x < w+2; x++){
-      cells[x][0].A = cells[x][1].A;
-      cells[x][0].B = cells[x][1].B;
-      cells[x][w+1].A = cells[x][w].A;
-      cells[x][w+1].B = cells[x][w].B;
-    }
-    */
-    for (int y = 0; y < h+2; y++){
+     for (int y = 0; y < h+2; y++){
+     cells[0][y].A = cells[1][y].A;
+     cells[0][y].B = cells[1][y].B;
+     cells[w+1][y].A = cells[w][y].A;
+     cells[w+1][y].B = cells[w][y].B;
+     }
+     for (int x = 0; x < w+2; x++){
+     cells[x][0].A = cells[x][1].A;
+     cells[x][0].B = cells[x][1].B;
+     cells[x][w+1].A = cells[x][w].A;
+     cells[x][w+1].B = cells[x][w].B;
+     }
+     */
+    for (int y = 0; y < h+2; y++) {
       cells[0][y].A = cells[w][y].A;
       cells[0][y].B = cells[w][y].B;
       cells[w+1][y].A = cells[1][y].A;
       cells[w+1][y].B = cells[1][y].B;
     }
-    for (int x = 0; x < w+2; x++){
+    for (int x = 0; x < w+2; x++) {
       cells[x][0].A = cells[x][h].A;
       cells[x][0].B = cells[x][h].B;
       cells[x][w+1].A = cells[x][1].A;
@@ -103,7 +112,8 @@ class CellSystem implements Runnable {
         pool.execute(tasks.get(i));
       }
       latch.await();
-    } catch (InterruptedException e) {
+    } 
+    catch (InterruptedException e) {
       pool.shutdown();
     }
   }
