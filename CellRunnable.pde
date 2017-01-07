@@ -25,7 +25,7 @@ class CellRunnable implements Runnable {
 
   void fillQueue() {
     for (int i = 0; i < n_cols; i++) {
-      for (int y = 0; y < height; y++) {
+      for (int y = 1; y < height-1; y++) {
         discover.add(c.cells[x+i][y]);
         computedFull = false;
         discoverFull = true;
@@ -40,10 +40,21 @@ class CellRunnable implements Runnable {
       // rates with other data (noise, x/y)
       float a_ = foo.A;
       float b_ = foo.B;
-      int x = (int)foo.pos.x;
-      int y = (int)foo.pos.y;
-      foo.A = a_ + (c.da*sum(x, y, 'A')) - (a_*b_*b_) + (fill_rate*(1-a_));
-      foo.B = b_ + (c.db*sum(x, y, 'B')) + (a_*b_*b_) - ((kill_rate+fill_rate)*b_);
+      int x = (int) foo.pos.x;
+      int y = (int) foo.pos.y;
+      float asum = 0.05 * (c.cells[x-1][y-1].A + c.cells[x-1][y+1].A + 
+                           c.cells[x+1][y-1].A + c.cells[x+1][y+1].A) + 
+                   0.20 * (c.cells[x-1][y].A + c.cells[x+1][y].A + 
+                           c.cells[x][y+1].A + c.cells[x][y-1].A)
+                   - a_;
+      float bsum = 0.05 * (c.cells[x-1][y-1].B + c.cells[x-1][y+1].B + 
+                           c.cells[x+1][y-1].B + c.cells[x+1][y+1].B) + 
+                   0.20 * (c.cells[x-1][y].B + c.cells[x+1][y].B + 
+                           c.cells[x][y+1].B + c.cells[x][y-1].B)
+                   - b_;
+      float abb = a_*b_*b_;
+      foo.A = a_ + (c.da*asum) - (abb) + (fill_rate*(1-a_));
+      foo.B = b_ + (c.db*bsum) + (abb) - ((kill_rate+fill_rate)*b_);
       computed.add(foo);
       discoverFull = false;
       computedFull = true;
@@ -57,21 +68,6 @@ class CellRunnable implements Runnable {
       c.cells[(int)foo.pos.x][(int)foo.pos.y].B = foo.B;
       computedFull = false;
     }
-  }
-
-  float sum(int _x, int _y, char _c) {
-    float sum = 0;
-    for (int x = -1; x <= 1; x++) {
-      for (int y = -1; y <= 1; y++) {
-        //if (_x+x < 0 || _x+x > c.w-1) return 0;
-        //if (_y+y < 0 || _y+y > c.h-1) return 0;
-        if (_c == 'B') sum += (c.cells[(_x+x+width/size)%(width/size)][(_y+y+height/size)%(height/size)].B * c.convolution[x+1][y+1]);
-        else sum += (c.cells[(_x+x+width/size)%(width/size)][(_y+y+height/size)%(height/size)].A * c.convolution[x+1][y+1]);
-        //if (_c == 'B') sum += (c.cells[_x+x][_y+y].B * c.convolution[x+1][y+1]);
-        //else sum += (c.cells[_x+x][_y+y].A * c.convolution[x+1][y+1]);
-      }
-    }
-    return sum;
   }
 
   void run() {

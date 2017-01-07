@@ -17,16 +17,16 @@ class CellSystem implements Runnable {
     k = _k;
     w = (int)width/size;
     h = (int)height/size;
-    cells = new Cell[w][h];
-    for (int x = 0; x < w; x++) {
-      for (int y = 0; y < h; y++) {
+    cells = new Cell[w+2][h+2];
+    for (int x = 0; x < w+2; x++) {
+      for (int y = 0; y < h+2; y++) {
         cells[x][y] = new Cell(x*size, y*size, size);
       }
     }
     pool = Executors.newFixedThreadPool((int)width/n_cols);      
     latch = new CountDownLatch((int)width/n_cols);
     tasks = new LinkedList<CellRunnable>();
-    for (int i = 0; i < width; i += n_cols) {
+    for (int i = 1; i < width-1; i += n_cols) {
       tasks.add(new CellRunnable(i, latch, n_cols));
     }
   }
@@ -58,10 +58,21 @@ class CellSystem implements Runnable {
   }
 
   void display() {
-    for (int x = 0; x < w; x++) {
-      for (int y = 0; y < h; y++) {
+    for (int x = 1; x < w-1; x++) {
+      for (int y = 1; y < h-1; y++) {
         cells[x][y].display();
       }
+    }
+  }
+  
+  void setBorder(){
+    for (int y = 0; y < height+2; y++){
+      cells[0][y].A = cells[(width/size)-1][y].A;
+      cells[0][y].B = cells[(width/size)-1][y].B;
+    }
+    for (int x = 0; x < width+2; x++){
+      cells[x][0].A = cells[x][(height/size)-1].A;
+      cells[x][0].B = cells[x][(height/size)-1].B;
     }
   }
 
@@ -71,6 +82,7 @@ class CellSystem implements Runnable {
         pool.execute(tasks.get(i));
       }
       latch.await();
+      setBorder();
     } catch (InterruptedException e) {
       pool.shutdown();
     }

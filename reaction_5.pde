@@ -17,7 +17,7 @@ float kill_rate = 0.029;
 float a_rate = 1;
 float b_rate = 0.5;
 
-boolean animated = false;
+boolean animated = true;
 boolean framerate = false;
 
 // Change of fill and kill rates during animation 
@@ -25,10 +25,10 @@ float d_fr = 0.000005;
 float d_kr = 0.000010;
 
 void setup() {
-  size(250, 250);
+  size(200, 200);
   noStroke();
   //colorMode(HSB);
-  c = new CellSystem(25, size, fill_rate, kill_rate, a_rate, b_rate);
+  c = new CellSystem(50, size, fill_rate, kill_rate, a_rate, b_rate);
   
   //c.randomPopulate(50);
   //c.quadPlace();
