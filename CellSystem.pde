@@ -66,23 +66,43 @@ class CellSystem implements Runnable {
   }
   
   void setBorder(){
-    for (int y = 0; y < height+2; y++){
-      cells[0][y].A = cells[(width/size)-1][y].A;
-      cells[0][y].B = cells[(width/size)-1][y].B;
+    // ALSO corners should technically go to the opposite corner but who cares
+    /* MIRRORING instead 
+    for (int y = 0; y < h+2; y++){
+      cells[0][y].A = cells[1][y].A;
+      cells[0][y].B = cells[1][y].B;
+      cells[w+1][y].A = cells[w][y].A;
+      cells[w+1][y].B = cells[w][y].B;
     }
-    for (int x = 0; x < width+2; x++){
-      cells[x][0].A = cells[x][(height/size)-1].A;
-      cells[x][0].B = cells[x][(height/size)-1].B;
+    for (int x = 0; x < w+2; x++){
+      cells[x][0].A = cells[x][1].A;
+      cells[x][0].B = cells[x][1].B;
+      cells[x][w+1].A = cells[x][w].A;
+      cells[x][w+1].B = cells[x][w].B;
+    }
+    */
+    for (int y = 0; y < h+2; y++){
+      cells[0][y].A = cells[w][y].A;
+      cells[0][y].B = cells[w][y].B;
+      cells[w+1][y].A = cells[1][y].A;
+      cells[w+1][y].B = cells[1][y].B;
+    }
+    for (int x = 0; x < w+2; x++){
+      cells[x][0].A = cells[x][h].A;
+      cells[x][0].B = cells[x][h].B;
+      cells[x][w+1].A = cells[x][1].A;
+      cells[x][w+1].B = cells[x][1].B;
     }
   }
 
   void run() {
     try {
+      setBorder();
+      //println(cells[0][100].A + " " + cells[0][201].A);
       for (int i = 0; i < (width/n_cols); i++) {
         pool.execute(tasks.get(i));
       }
       latch.await();
-      setBorder();
     } catch (InterruptedException e) {
       pool.shutdown();
     }

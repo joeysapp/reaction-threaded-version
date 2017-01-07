@@ -25,7 +25,7 @@ class CellRunnable implements Runnable {
 
   void fillQueue() {
     for (int i = 0; i < n_cols; i++) {
-      for (int y = 1; y < height-1; y++) {
+      for (int y = 1; y < height+1; y++) {
         discover.add(c.cells[x+i][y]);
         computedFull = false;
         discoverFull = true;
